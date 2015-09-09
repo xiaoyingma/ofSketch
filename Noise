@@ -1,0 +1,109 @@
+ofPixels pixels;
+ofEasyCam camera;
+ofColor getColor;
+ofTexture bw;
+ofVideoGrabber grabber;
+int  camWidth;
+int  camHeight;
+ 
+void setup() 
+{
+	ofSetFullscreen(true);
+    ofEnableAlphaBlending();
+    ofEnableDepthTest();
+    ofSetFrameRate(10);
+    camWidth = 60;
+	camHeight = 40;
+  	grabber.initGrabber(camWidth,camHeight);
+  	bw.allocate(camWidth, camHeight, GL_LUMINANCE);
+    ofSetCircleResolution(100);
+	ofSetVerticalSync(true);
+}
+
+
+void update() 
+{
+    grabber.update();
+    
+    if(grabber.isFrameNew()) {  
+		bw.loadData(grabber.getPixelsRef(), GL_LUMINANCE);  
+	}  
+  
+	if(grabber.isFrameNew()) {  
+		pixels = grabber.getPixelsRef();
+	}  
+ 
+
+    if (grabber.isFrameNew()){
+		int totalPixels = camWidth*camHeight*2;
+	}
+}
+ 
+void draw() 
+{
+
+   
+   camera.begin();
+   ofBackground(0);
+   ofPushMatrix();
+   ofScale(1, -1);
+   ofTranslate(- (pixels.getWidth() * 10) / 2, - (pixels.getHeight() * 10) / 2);
+ 
+    for(std::size_t x = 0; x < pixels.getWidth(); ++x)
+    {
+       for(std::size_t y = 0; y < pixels.getHeight(); ++y)
+        {
+            ofColor color = pixels.getColor(x,y)*1.5;    
+            
+             float z = ofMap(color.getBrightness(), 0, 255, 0, 333);
+             ofVec3f position(x * 10, y * 10, z);
+ 
+            ofFill();
+            //ofSetColor(255,255,255,32);
+            //int m = ofRandom (5,20);
+            //ofEllipse(position+ 30, m, m);
+            ofSetHexColor(0x999999);
+            int a = ofRandom (8,12);
+            ofLine(position, position+ a);
+            ofSetHexColor(0xffffff);
+            int b = ofRandom (5,8);
+            ofLine(position*1.1,position*1.1+b);
+            int c = ofRandom (2,5);
+            ofSetHexColor(0x999999);
+            ofLine(position*1.2, position*1.2+c);
+            ofSetHexColor(0x999999);
+            ofLine(position*1.3, position*1.3+c);           
+            
+            
+        }
+        
+    }
+    
+    
+ 
+    ofPopMatrix();
+    ofMesh();
+    
+ 
+    camera.end();
+    
+}
+
+
+void keyPressed(int key) {
+    
+    
+    if('w' == key)
+    {
+    	// move camera in
+        int dist = camera.getDistance();
+        camera.setDistance(dist-10);
+    }
+    
+    if('s' == key)
+    {
+    	// move camera out
+        int dist = camera.getDistance();
+        camera.setDistance(dist+10);
+    }
+}
